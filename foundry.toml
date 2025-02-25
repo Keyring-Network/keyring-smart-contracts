@@ -1,89 +1,17 @@
 [profile.default]
 src = "src"
-libs = ["lib"]
+libs = ["dependencies"] # <= This is important to be added
 ffi = true
 ast = true
 build_info = true
 extra_output = ["storageLayout"]
-out = "out-test"
-fs_permissions = [{ access = "read", path = "out-test" }, { access = "read", path = "test/vectors"}]
+out = "out"
+solc = "0.8.22"
+fs_permissions = [{ access = "read", path = "out" }, { access = "read-write", path = "addresses" }, { access = "read", path = "test/vectors" }]
 
-[profile.uat]
-src = "src"
-libs = ["lib"]
-ffi = true
-ast = true
-build_info = true
-extra_output = ["storageLayout"]
-out = "out-uat"
-fs_permissions = [{ access = "read", path = "out-uat" }]
+[dependencies]
+forge-std = "1.9.6"
+openzeppelin-foundry-upgrades = "0.4.0"
+"@openzeppelin-contracts-upgradeable" = "5.2.0"
+"@openzeppelin-contracts" = "5.2.0"
 
-[profile.staging]
-src = "src"
-libs = ["lib"]
-ffi = true
-ast = true
-build_info = true
-extra_output = ["storageLayout"]
-out = "out-staging"
-fs_permissions = [{ access = "read", path = "out-staging" }]
-
-[profile.prod]
-src = "src"
-libs = ["lib"]
-ffi = true
-ast = true
-build_info = true
-extra_output = ["storageLayout"]
-out = "out-prod"
-fs_permissions = [{ access = "read", path = "out-prod" }]
-
-[profile.arbitrum]
-src = "src"
-libs = ["lib"]
-ffi = true
-ast = true
-build_info = true
-extra_output = ["storageLayout"]
-out = "out-arbitrum"
-fs_permissions = [{ access = "read", path = "out-arbitrum" }]
-
-[profile.base]
-src = "src"
-libs = ["lib"]
-ffi = true
-ast = true
-build_info = true
-extra_output = ["storageLayout"]
-out = "out-base"
-fs_permissions = [{ access = "read", path = "out-base" }]
-
-[profile.optimism]
-src = "src"
-libs = ["lib"]
-ffi = true
-ast = true
-build_info = true
-extra_output = ["storageLayout"]
-out = "out-optimism"
-fs_permissions = [{ access = "read", path = "out-optimism" }]
-
-[profile.avalanche]
-src = "src"
-libs = ["lib"]
-ffi = true
-ast = true
-build_info = true
-extra_output = ["storageLayout"]
-out = "out-avalanche"
-fs_permissions = [{ access = "read", path = "out-avalanche" }]
-
-[profile.zksync]
-src = "src"
-libs = ["lib"]
-ffi = true
-ast = true
-build_info = true
-extra_output = ["storageLayout"]
-out = "out-zksync"
-fs_permissions = [{ access = "read", path = "out-zksync" }]

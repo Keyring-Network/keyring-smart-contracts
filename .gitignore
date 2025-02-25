@@ -1,16 +1,6 @@
 # Compiler files
 cache/
 out/
-out-test/
-out-uat/
-out-staging/
-out-prod/
-out-arbitrum/
-out-base/
-out-optimism/
-out-avalanche/
-out-zksync/
-zkout/
 
 # Ignores development broadcast logs
 /broadcast/
@@ -21,16 +11,12 @@ zkout/
 
 # Dotenv file
 .env
-.env.test
-.env.uat
-.env.staging
-.env.prod
-.env.prod.arbitrum
-.env.prod.base
-.env.prod.optimism
-.env.prod.avalanche
-.env.prod.zksync
-
+.env.*
+!.env.example
 
 # MacOS
 .DS_Store
+
+
+# Soldeer
+/dependencies
