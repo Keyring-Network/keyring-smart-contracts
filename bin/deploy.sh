@@ -91,6 +91,8 @@ for SIGNATURE_CHECKER_NAME in $SIGNATURE_CHECKERS_NAMES; do
     echo "Proxy address for the signature checker $SIGNATURE_CHECKER_NAME: $(cat "$OUT_FOLDER/KeyringCoreProxy.address")"
     NEW_NAME=$(echo "$SIGNATURE_CHECKER_NAME" | sed 's/SignatureChecker//')
     mv "$OUT_FOLDER/KeyringCoreProxy.address" "$OUT_FOLDER/KeyringCore$NEW_NAME.address"
+    mkdir -p "$OUT_FOLDER/KeyringCore$NEW_NAME.sol"
+    ln -s "$OUT_FOLDER/KeyringCore.sol/KeyringCore.json" "$OUT_FOLDER/KeyringCore$NEW_NAME.sol/KeyringCore$NEW_NAME.json"
 done
 
 
