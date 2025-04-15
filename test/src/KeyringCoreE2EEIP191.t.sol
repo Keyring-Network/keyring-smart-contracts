@@ -25,7 +25,7 @@ contract KeyringCoreE2EEIP191Test is BaseDeployTest {
         setEnv("PRIVATE_KEY", deployerPrivateKey);
         keyringCore = run();
         vm.startPrank(keyringCore.admin());
-        keyringCore.registerKey(block.chainid, block.timestamp + 1000, key);
+        keyringCore.registerKey(block.timestamp, block.timestamp + 1000, key);
         vm.stopPrank();
         assertEq(keyringCore.getKeyHash(key), 0x8dd832049319556c1cd22ed66ae790d07fea25830a6151c2f0a9879b3ef61305);
     }
@@ -33,7 +33,7 @@ contract KeyringCoreE2EEIP191Test is BaseDeployTest {
     function test_createCredentialWithRegisteredKey() public {
         assertEq(keyringCore.checkCredential(tradingAddress, policyId), false);
         keyringCore.createCredential{value: cost}(
-            tradingAddress, policyId, uint256(block.chainid), validUntil, cost, key, signatureMsg, backdoor
+            tradingAddress, policyId, block.chainid, validUntil, cost, key, signatureMsg, backdoor
         );
         assertEq(keyringCore.checkCredential(tradingAddress, policyId), true);
     }
@@ -44,7 +44,7 @@ contract KeyringCoreE2EEIP191Test is BaseDeployTest {
             abi.encodeWithSelector(IKeyringCore.ErrInvalidCredential.selector, policyId, tradingAddress, "SIG")
         );
         keyringCore.createCredential{value: cost}(
-            tradingAddress, policyId, uint256(block.chainid), validUntil, cost, key, invalidSignatureMsg, backdoor
+            tradingAddress, policyId, block.chainid, validUntil, cost, key, invalidSignatureMsg, backdoor
         );
         assertEq(keyringCore.checkCredential(tradingAddress, policyId), false);
     }
@@ -58,7 +58,7 @@ contract KeyringCoreE2EEIP191Test is BaseDeployTest {
             abi.encodeWithSelector(IKeyringCore.ErrInvalidCredential.selector, policyId, tradingAddress, "BDK")
         );
         keyringCore.createCredential{value: cost}(
-            tradingAddress, policyId, uint256(block.chainid), validUntil, cost, key, signatureMsg, backdoor
+            tradingAddress, policyId, block.chainid, validUntil, cost, key, signatureMsg, backdoor
         );
     }
 }

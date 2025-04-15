@@ -125,7 +125,7 @@ contract KeyringCore is IKeyringCore, Initializable, OwnableUpgradeable, UUPSUpg
         {
             bytes32 keyHash = getKeyHash(key);
             KeyEntry memory entry = _keys[keyHash];
-            bool isValid = (entry.isValid && block.chainid == entry.chainId && currentTime <= entry.validTo);
+            bool isValid = (entry.isValid && currentTime >= entry.validFrom && currentTime <= entry.validTo);
             // Verify the key is valid.
             if (!isValid) {
                 revert ErrInvalidCredential(policyId, tradingAddress, "BDK");
@@ -283,17 +283,17 @@ contract KeyringCore is IKeyringCore, Initializable, OwnableUpgradeable, UUPSUpg
 
     /**
      * @notice Registers a new RSA key.
-     * @param chainId The chainId for which a credential is valid.
+     * @param validFrom The start time of the key's validity.
      * @param validTo The end time of the key's validity.
      * @param key The RSA key.
      * @dev Only callable by the admin.
      */
-    function registerKey(uint256 chainId, uint256 validTo, bytes memory key) external {
+    function registerKey(uint256 validFrom, uint256 validTo, bytes memory key) external {
         if (msg.sender != _admin) {
             revert ErrCallerNotAdmin(msg.sender);
         }
-        if (chainId != block.chainid) {
-            revert ErrInvalidKeyRegistration("CHAINID");
+        if (validTo <= validFrom) {
+            revert ErrInvalidKeyRegistration("IVP");
         }
         if (validTo < block.timestamp) {
             revert ErrInvalidKeyRegistration("EXP");
@@ -302,8 +302,8 @@ contract KeyringCore is IKeyringCore, Initializable, OwnableUpgradeable, UUPSUpg
         if (_keys[keyHash].isValid) {
             revert ErrInvalidKeyRegistration("KAR");
         }
-        _keys[keyHash] = KeyEntry(true, uint64(chainId), uint64(validTo));
-        emit KeyRegistered(keyHash, chainId, validTo, key);
+        _keys[keyHash] = KeyEntry(true, uint64(validFrom), uint64(validTo));
+        emit KeyRegistered(keyHash, validFrom, validTo, key);
     }
 
     /**

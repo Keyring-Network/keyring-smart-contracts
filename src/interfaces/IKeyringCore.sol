@@ -23,12 +23,12 @@ interface IKeyringCore {
      * @notice Represents a key entry.
      * @dev Contains validity status and the validity period of the key.
      * @param isValid Indicates if the key is valid.
-     * @param chainId The chainId for which a credential is valid.
+     * @param validFrom The start time of the key's validity.
      * @param validTo The end time of the key's validity.
      */
     struct KeyEntry {
         bool isValid;
-        uint64 chainId;
+        uint64 validFrom;
         uint64 validTo;
     }
 
@@ -70,10 +70,10 @@ interface IKeyringCore {
 
     /// @notice Event emitted when a key is registered.
     /// @param keyHash The hash of the key.
-    /// @param chainId The chainId for which the key is valid.
+    /// @param validFrom The start time of the key's validity.
     /// @param validTo The end time of the key's validity.
     /// @param publicKey The public key.
-    event KeyRegistered(bytes32 indexed keyHash, uint256 indexed chainId, uint256 indexed validTo, bytes publicKey);
+    event KeyRegistered(bytes32 indexed keyHash, uint256 indexed validFrom, uint256 indexed validTo, bytes publicKey);
 
     /// @notice Event emitted when a key is revoked.
     /// @param keyHash The hash of the key.
