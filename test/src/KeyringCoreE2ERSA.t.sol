@@ -32,8 +32,8 @@ contract KeyringCoreE2ERSATest is BaseDeployTest {
         setEnv("PRIVATE_KEY", deployerPrivateKey);
         keyringCore = run();
         vm.startPrank(keyringCore.admin());
-        keyringCore.registerKey(block.chainid, block.timestamp + 1000, registeredKey1);
-        keyringCore.registerKey(block.chainid, block.timestamp + 1000, registeredKey2);
+        keyringCore.registerKey(block.timestamp, block.timestamp + 1000, registeredKey1);
+        keyringCore.registerKey(block.timestamp, block.timestamp + 1000, registeredKey2);
         vm.stopPrank();
         assertEq(
             keyringCore.getKeyHash(registeredKey1), 0xe52a7c12d4c85c83f074d657813427b6d9c7ac2fef28d112045580ce15154373

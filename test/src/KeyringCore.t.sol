@@ -42,7 +42,9 @@ contract KeyringCoreTest is Test {
     }
 
     function test_RegisterAndRevokeKey() public {
-        keyringCore.registerKey(block.chainid, validTo, key);
+        uint256 validFrom = block.timestamp;
+        validTo = validFrom + 1 days;
+        keyringCore.registerKey(validFrom, validTo, key);
         bytes32 keyHash = keccak256(key);
         assertTrue(keyringCore.keyExists(keyHash));
 
@@ -71,13 +73,17 @@ contract KeyringCoreTest is Test {
     }
 
     function test_FailRegisterKeyFromNonAdmin() public {
+        uint256 validFrom = block.timestamp;
+        validTo = validFrom + 1 days;
         vm.prank(newAdmin);
         vm.expectRevert(abi.encodeWithSelector(IKeyringCore.ErrCallerNotAdmin.selector, newAdmin));
-        keyringCore.registerKey(block.chainid, validTo, key);
+        keyringCore.registerKey(validFrom, validTo, key);
     }
 
     function test_FailRevokeKeyFromNonAdmin() public {
-        keyringCore.registerKey(block.chainid, validTo, key);
+        uint256 validFrom = block.timestamp;
+        validTo = validFrom + 1 days;
+        keyringCore.registerKey(validFrom, validTo, key);
         bytes32 keyHash = keccak256(key);
 
         vm.prank(newAdmin);
@@ -128,7 +134,7 @@ contract KeyringCoreTest is Test {
     function test_RegisterKeyByAdmin() public {
         uint256 validFrom = block.timestamp;
         validTo = validFrom + 1 days;
-        keyringCore.registerKey(block.chainid, validTo, testKey);
+        keyringCore.registerKey(validFrom, validTo, testKey);
         assertTrue(keyringCore.keyExists(testKeyHash));
     }
 
@@ -137,21 +143,21 @@ contract KeyringCoreTest is Test {
         validTo = validFrom + 1 days;
         vm.prank(newAdmin);
         vm.expectRevert(abi.encodeWithSelector(IKeyringCore.ErrCallerNotAdmin.selector, newAdmin));
-        keyringCore.registerKey(block.chainid, validTo, testKey);
+        keyringCore.registerKey(validFrom, validTo, testKey);
     }
 
     function test_RegisterKeyAlreadyRegistered() public {
         uint256 validFrom = block.timestamp;
         validTo = validFrom + 1 days;
-        keyringCore.registerKey(block.chainid, validTo, testKey);
+        keyringCore.registerKey(validFrom, validTo, testKey);
         vm.expectRevert(abi.encodeWithSelector(IKeyringCore.ErrInvalidKeyRegistration.selector, "KAR"));
-        keyringCore.registerKey(block.chainid, validTo, testKey);
+        keyringCore.registerKey(validFrom, validTo, testKey);
     }
 
     function test_RevokeKeyByAdmin() public {
         uint256 validFrom = block.timestamp;
         validTo = validFrom + 1 days;
-        keyringCore.registerKey(block.chainid, validTo, testKey);
+        keyringCore.registerKey(validFrom, validTo, testKey);
         keyringCore.revokeKey(testKeyHash);
         assertFalse(keyringCore.keyExists(testKeyHash));
     }
@@ -159,7 +165,7 @@ contract KeyringCoreTest is Test {
     function test_RevokeKeyByNonAdmin() public {
         uint256 validFrom = block.timestamp;
         validTo = validFrom + 1 days;
-        keyringCore.registerKey(block.chainid, validTo, testKey);
+        keyringCore.registerKey(validFrom, validTo, testKey);
         vm.prank(newAdmin);
         vm.expectRevert(abi.encodeWithSelector(IKeyringCore.ErrCallerNotAdmin.selector, newAdmin));
         keyringCore.revokeKey(testKeyHash);
@@ -198,7 +204,7 @@ contract KeyringCoreTest is Test {
     function test_CredentialCreationExpired() public {
         uint256 validFrom = block.timestamp;
         validTo = validFrom + 2 days;
-        keyringCore.registerKey(block.chainid, validTo, testKey);
+        keyringCore.registerKey(validFrom, validTo, testKey);
 
         uint256 validUntil = block.timestamp + 1 days;
         vm.warp(block.timestamp + 1 days + 1 minutes);
@@ -211,7 +217,7 @@ contract KeyringCoreTest is Test {
     function test_CreateCredentialWithWrongChainId() public {
         uint256 validFrom = block.timestamp;
         validTo = validFrom + 1 days;
-        keyringCore.registerKey(block.chainid, validTo, testKey);
+        keyringCore.registerKey(validFrom, validTo, testKey);
 
         uint256 validUntil = block.timestamp + 1 days;
 
@@ -223,7 +229,7 @@ contract KeyringCoreTest is Test {
     function test_CreateCredentialOkAndKo() public {
         uint256 validFrom = block.timestamp;
         validTo = validFrom + 1 days;
-        keyringCore.registerKey(block.chainid, validTo, testKey);
+        keyringCore.registerKey(validFrom, validTo, testKey);
 
         // pass 1 - new credential
         uint256 validUntil = block.timestamp + 1 days;
@@ -245,7 +251,7 @@ contract KeyringCoreTest is Test {
     function test_CreateCredentialInsufficientPayment() public {
         uint256 validFrom = block.timestamp;
         validTo = validFrom + 1 days;
-        keyringCore.registerKey(block.chainid, validTo, testKey);
+        keyringCore.registerKey(validFrom, validTo, testKey);
 
         uint256 validUntil = block.timestamp + 1 days;
 
@@ -256,7 +262,7 @@ contract KeyringCoreTest is Test {
     function test_CreateCredentialInvalidKey() public {
         uint256 validFrom = block.timestamp;
         validTo = validFrom + 1 days;
-        keyringCore.registerKey(block.chainid, validTo, testKey);
+        keyringCore.registerKey(validFrom, validTo, testKey);
         vm.warp(block.timestamp + 2 days);
 
         uint256 validUntil = block.timestamp + 1 days;
@@ -268,7 +274,7 @@ contract KeyringCoreTest is Test {
     function test_CreateCredentialBlacklistedEntity() public {
         uint256 validFrom = block.timestamp;
         validTo = validFrom + 1 days;
-        keyringCore.registerKey(block.chainid, validTo, testKey);
+        keyringCore.registerKey(validFrom, validTo, testKey);
         keyringCore.blacklistEntity(1, newAdmin);
 
         uint256 validUntil = block.timestamp + 1 days;
@@ -280,7 +286,7 @@ contract KeyringCoreTest is Test {
     function test_CreateCredentialExpirationInPast() public {
         uint256 validFrom = block.timestamp;
         validTo = validFrom + 1 days;
-        keyringCore.registerKey(block.chainid, validTo, testKey);
+        keyringCore.registerKey(validFrom, validTo, testKey);
 
         uint256 validUntil = block.timestamp + 1 days;
 
@@ -293,7 +299,7 @@ contract KeyringCoreTest is Test {
     function test_CollectFeesByAdmin() public {
         uint256 validFrom = block.timestamp;
         validTo = validFrom + 1 days;
-        keyringCore.registerKey(block.chainid, validTo, testKey);
+        keyringCore.registerKey(validFrom, validTo, testKey);
 
         uint256 validUntil = block.timestamp + 1 days;
 
@@ -325,7 +331,7 @@ contract KeyringCoreTest is Test {
     function test_KeyExists() public {
         uint256 validFrom = block.timestamp;
         validTo = validFrom + 1 days;
-        keyringCore.registerKey(block.chainid, validTo, testKey);
+        keyringCore.registerKey(validFrom, validTo, testKey);
         assertTrue(keyringCore.keyExists(testKeyHash));
         keyringCore.revokeKey(testKeyHash);
         assertFalse(keyringCore.keyExists(testKeyHash));
@@ -334,16 +340,16 @@ contract KeyringCoreTest is Test {
     function test_KeyValidTo() public {
         uint256 validFrom = block.timestamp;
         validTo = validFrom + 1 days;
-        keyringCore.registerKey(block.chainid, validTo, testKey);
+        keyringCore.registerKey(validFrom, validTo, testKey);
         assertEq(keyringCore.keyValidTo(testKeyHash), validTo);
     }
 
     function test_KeyDetails() public {
         uint256 validFrom = block.timestamp;
         validTo = validFrom + 1 days;
-        keyringCore.registerKey(block.chainid, validTo, testKey);
+        keyringCore.registerKey(validFrom, validTo, testKey);
         IKeyringCore.KeyEntry memory kd = keyringCore.keyDetails(testKeyHash);
-        assertEq(kd.chainId, block.chainid);
+        assertEq(kd.validFrom, validFrom);
         assertEq(kd.validTo, validTo);
         assertTrue(kd.isValid);
     }
@@ -358,7 +364,7 @@ contract KeyringCoreTest is Test {
     function test_EntityExp() public {
         uint256 validFrom = block.timestamp;
         validTo = validFrom + 1 days;
-        keyringCore.registerKey(block.chainid, validTo, testKey);
+        keyringCore.registerKey(validFrom, validTo, testKey);
 
         uint256 validUntil = block.timestamp + 1 days;
 
@@ -369,7 +375,7 @@ contract KeyringCoreTest is Test {
     function test_EntityData() public {
         uint256 validFrom = block.timestamp;
         validTo = validFrom + 1 days;
-        keyringCore.registerKey(block.chainid, validTo, testKey);
+        keyringCore.registerKey(validFrom, validTo, testKey);
 
         uint256 validUntil = block.timestamp + 1 days;
 
@@ -382,7 +388,7 @@ contract KeyringCoreTest is Test {
     function test_CheckCredential() public {
         uint256 validFrom = block.timestamp;
         validTo = validFrom + 1 days;
-        keyringCore.registerKey(block.chainid, validTo, testKey);
+        keyringCore.registerKey(validFrom, validTo, testKey);
 
         uint256 validUntil = block.timestamp + 1 days;
 
@@ -393,7 +399,7 @@ contract KeyringCoreTest is Test {
     function test_CheckCredentialExpired() public {
         uint256 validFrom = block.timestamp;
         validTo = validFrom + 1 days;
-        keyringCore.registerKey(block.chainid, validTo, testKey);
+        keyringCore.registerKey(validFrom, validTo, testKey);
 
         uint256 validUntil = block.timestamp + 1 days;
 
@@ -406,7 +412,7 @@ contract KeyringCoreTest is Test {
     function test_CheckCredentialBlacklisted() public {
         uint256 validFrom = block.timestamp;
         validTo = validFrom + 1 days;
-        keyringCore.registerKey(block.chainid, validTo, testKey);
+        keyringCore.registerKey(validFrom, validTo, testKey);
 
         uint256 validUntil = block.timestamp + 1 days;
 
