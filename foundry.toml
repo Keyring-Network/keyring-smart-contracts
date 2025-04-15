@@ -6,9 +6,18 @@ ast = true
 build_info = true
 extra_output = ["storageLayout"]
 out = "out"
-solc = "0.8.22"
-evm_version = "paris"
+optimizer = true
+optimizer_runs = 20_000
 fs_permissions = [{ access = "read-write", path = "out" }, { access = "read", path = "test/fixtures" }]
+
+[profile.linea]
+evm_version = "paris"
+solc = "0.8.22"
+
+[profile.zksync]
+compile = true
+zksolc = "1.5.12"
+verifier="zksync"
 
 [dependencies]
 forge-std = "1.9.6"
