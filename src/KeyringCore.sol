@@ -49,7 +49,6 @@ contract KeyringCore is IKeyringCore, Initializable, OwnableUpgradeable, UUPSUpg
      * @param _signatureChecker The address of the signature checker.
      * @dev This function is only callable by the owner.
      */
-    /// @custom:oz-upgrades-validate-as-initializer
     function reinitialize(address _signatureChecker) public onlyOwner reinitializer(CURRENT_VERSION) {
         setSignatureChecker(_signatureChecker);
     }
