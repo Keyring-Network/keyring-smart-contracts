@@ -149,7 +149,7 @@ contract KeyringCoreTest is Test {
     function test_RegisterKeyAlreadyRegistered() public {
         uint256 validFrom = block.timestamp;
         validTo = validFrom + 1 days;
-            keyringCore.registerKey(validFrom, validTo, testKey);
+        keyringCore.registerKey(validFrom, validTo, testKey);
         vm.expectRevert(abi.encodeWithSelector(IKeyringCore.ErrInvalidKeyRegistration.selector, "KAR"));
         keyringCore.registerKey(validFrom, validTo, testKey);
     }
