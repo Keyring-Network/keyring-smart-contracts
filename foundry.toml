@@ -6,6 +6,7 @@ ast = true
 build_info = true
 extra_output = ["storageLayout"]
 out = "out"
+solc = "0.8.22"
 fs_permissions = [{ access = "read-write", path = "out" }, { access = "read", path = "test/fixtures" }]
 
 [dependencies]
