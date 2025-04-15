@@ -8,11 +8,11 @@ extra_output = ["storageLayout"]
 out = "out"
 optimizer = true
 optimizer_runs = 20_000
-solc = "0.8.22"
 fs_permissions = [{ access = "read-write", path = "out" }, { access = "read", path = "test/fixtures" }]
 
 [profile.linea]
 evm_version = "paris"
+solc = "0.8.22"
 
 [profile.zksync]
 compile = true
