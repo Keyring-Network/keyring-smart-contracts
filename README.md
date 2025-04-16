@@ -1,7 +1,7 @@
 # Keyring Network Smart Contracts
 
-[![Deploy Tests](https://github.com/keyring-network/smart-contracts/actions/workflows/docker.yml/badge.svg)](https://github.com/keyring-network/smart-contracts/actions/workflows/docker.yml)
-[![Unit Tests](https://github.com/keyring-network/smart-contracts/actions/workflows/forge.yml/badge.svg)](https://github.com/keyring-network/smart-contracts/actions/workflows/forge.yml)
+[![Deploy Tests](https://github.com/keyring-network/keyring-smart-contracts/actions/workflows/docker.yml/badge.svg)](https://github.com/keyring-network/keyring-smart-contracts/actions/workflows/docker.yml)
+[![Unit Tests](https://github.com/keyring-network/keyring-smart-contracts/actions/workflows/forge.yml/badge.svg)](https://github.com/keyring-network/keyring-smart-contracts/actions/workflows/forge.yml)
 
 Smart contracts for [Keyring Network](https://www.keyring.network/), a platform providing institutional-grade compliance automation and permissioning solutions for blockchain protocols powered by zero-knowledge privacy.
 
