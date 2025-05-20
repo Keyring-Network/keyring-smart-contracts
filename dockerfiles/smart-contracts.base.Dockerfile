@@ -43,6 +43,7 @@ COPY .git .git
 COPY foundry.toml .
 COPY remappings.txt .
 COPY src ./src
-
+RUN curl -L https://foundry.paradigm.xyz/ | bash && \
+    ~/.foundry/bin/foundryup
 # Initialize the Forge project
 RUN forge soldeer install
