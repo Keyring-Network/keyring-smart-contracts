@@ -3,7 +3,7 @@
 # The project directory is prepared and dependencies are initialized using Forge.
 
 # Use a lightweight base image
-FROM ubuntu:20.04
+FROM ubuntu:22.04
 
 # Set the timezone to UTC non-interactively
 ENV TZ=Etc/UTC
