@@ -9,4 +9,13 @@ interface IDeployOptions {
         string etherscanApiKey;
         string verifierUrl;
     }
+
+    struct RotateKeyOptions {
+        uint256 deployerPrivateKey;
+        address proxyAddress;
+        string previousKey;
+        string key;
+        uint256 validFrom;
+        uint256 validUntil;
+    }
 }
