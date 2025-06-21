@@ -1,4 +1,5 @@
 #!/bin/bash
+# This script uses testnet-config.sh to start a local testnet node and then deploys the contracts to it.
 
 # This script builds Docker images for the core-v2 project and starts a local testnet.
 # It ensures a clean environment by removing any existing testnet containers before starting a new one.

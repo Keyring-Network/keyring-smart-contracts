@@ -1,4 +1,5 @@
 #!/bin/bash
+# This script is intended to be used by testnet.sh to start a local testnet node and then deploys the contracts to it.
 
 # This script configures and starts a local Anvil testnet node with a specified genesis file and funded account.
 # It ensures the testnet is properly initialized and ready to accept connections before completing.

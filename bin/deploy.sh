@@ -93,6 +93,8 @@ for SIGNATURE_CHECKER_NAME in $SIGNATURE_CHECKERS_NAMES; do
     mv "$OUT_FOLDER/KeyringCoreProxy.address" "$OUT_FOLDER/KeyringCore$NEW_NAME.address"
     mkdir -p "$OUT_FOLDER/KeyringCore$NEW_NAME.sol"
     ln -s "$OUT_FOLDER/KeyringCore.sol/KeyringCore.json" "$OUT_FOLDER/KeyringCore$NEW_NAME.sol/KeyringCore$NEW_NAME.json"
+    echo "Saved the contract to: $OUT_FOLDER/KeyringCore.sol/KeyringCore.json"
+    echo "Created symlink at: $OUT_FOLDER/KeyringCore$NEW_NAME.sol/KeyringCore$NEW_NAME.json"
 done
 
 
