@@ -26,11 +26,12 @@ contract RotateKey is Script, IDeployOptions {
     }
 
     function rotateKey(RotateKeyOptions memory _rotateKeyOptions) public {
-        bytes memory previousKey = vm.parseBytes(_rotateKeyOptions.previousKey);
+        bytes memory previousKey =
+            bytes(_rotateKeyOptions.previousKey).length > 0 ? vm.parseBytes(_rotateKeyOptions.previousKey) : bytes("");
         bytes memory key = vm.parseBytes(_rotateKeyOptions.key);
 
         vm.startBroadcast(_rotateKeyOptions.deployerPrivateKey);
-        KeyringCore(_rotateKeyOptions.proxyAddress).revokeKey(keccak256(previousKey));
+        if (previousKey.length > 0) KeyringCore(_rotateKeyOptions.proxyAddress).revokeKey(keccak256(previousKey));
         KeyringCore(_rotateKeyOptions.proxyAddress).registerKey(
             _rotateKeyOptions.validFrom, _rotateKeyOptions.validUntil, key
         );
