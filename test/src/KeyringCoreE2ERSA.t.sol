@@ -30,8 +30,13 @@ contract KeyringCoreE2ERSATest is BaseDeployTest {
         vm.chainId(1625247600);
         setEnv("SIGNATURE_CHECKER_NAME", "RSASignatureChecker");
         setEnv("PRIVATE_KEY", deployerPrivateKey);
+        setEnv("ADMIN", deployerAddress);
+        setEnv("KEY_MANAGER", deployerAddress);
+        setEnv("UPGRADER", deployerAddress);
+        setEnv("BLACKLIST_MANAGER", deployerAddress);
+        setEnv("OPERATOR", deployerAddress);
         keyringCore = run();
-        vm.startPrank(keyringCore.admin());
+        vm.startPrank(deployerAddress);
         keyringCore.registerKey(block.timestamp, block.timestamp + 1000, registeredKey1);
         keyringCore.registerKey(block.timestamp, block.timestamp + 1000, registeredKey2);
         vm.stopPrank();
