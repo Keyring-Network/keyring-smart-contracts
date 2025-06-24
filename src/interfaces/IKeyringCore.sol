@@ -38,10 +38,6 @@ interface IKeyringCore {
     /// @notice This error is returned if the contract is already initialized. Prevents double set of admin on upgrade.
     error ErrAlreadyInitialized();
 
-    /// @notice Error for unauthorized admin caller.
-    /// @param caller The address of the unauthorized caller.
-    error ErrCallerNotAdmin(address caller);
-
     /// @notice Error for invalid key registration.
     /// @param reason The reason for the invalid key registration.
     error ErrInvalidKeyRegistration(string reason);
@@ -101,12 +97,22 @@ interface IKeyringCore {
     /// @param entity The address of the entity.
     event EntityUnblacklisted(uint256 indexed policyId, address indexed entity);
 
-    /// @notice Event emitted when the admin is set.
-    /// @param oldAdmin The address of the old admin.
-    /// @param newAdmin The address of the new admin.
-    event AdminSet(address indexed oldAdmin, address indexed newAdmin);
+    function KEY_MANAGER_ROLE() external view returns (bytes32);
 
-    function initialize(address signatureChecker) external;
+    function UPGRADER_ROLE() external view returns (bytes32);
+
+    function BLACKLIST_MANAGER_ROLE() external view returns (bytes32);
+
+    function OPERATOR_ROLE() external view returns (bytes32);
+
+    function initialize(
+        address _signatureChecker,
+        address _admin,
+        address _keyManager,
+        address _upgrader,
+        address _blacklistManager,
+        address _operator
+    ) external;
 
     /**
      * @notice Creates a credential for an entity.
@@ -130,12 +136,6 @@ interface IKeyringCore {
         bytes calldata signature,
         bytes calldata backdoor
     ) external payable;
-
-    /**
-     * @notice Sets the admin.
-     * @param newAdmin The address of the new admin.
-     */
-    function setAdmin(address newAdmin) external;
 
     /**
      * @notice Registers a key.
@@ -176,12 +176,6 @@ interface IKeyringCore {
     /// @param entity_ The address of the entity.
     /// @return True if the credential is valid, false otherwise.
     function checkCredential(uint256 policyId_, address entity_) external view returns (bool);
-
-    /**
-     * @notice Returns the admin.
-     * @return The address of the admin.
-     */
-    function admin() external view returns (address);
 
     /**
      * @notice Returns if a key exists.

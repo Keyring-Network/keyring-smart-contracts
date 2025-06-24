@@ -6,6 +6,11 @@ interface IDeployOptions {
         uint256 deployerPrivateKey;
         string signatureCheckerName;
         string proxyAddress;
+        address admin;
+        address keyManager;
+        address upgrader;
+        address blacklistManager;
+        address operator;
         string etherscanApiKey;
         string verifierUrl;
     }

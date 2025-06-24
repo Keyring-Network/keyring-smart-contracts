@@ -4,16 +4,19 @@ pragma solidity 0.8.22;
 import "@openzeppelin-contracts-upgradeable/access/OwnableUpgradeable.sol";
 import "@openzeppelin-contracts-upgradeable/proxy/utils/Initializable.sol";
 import "@openzeppelin-contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
+import "@openzeppelin-contracts-upgradeable/access/AccessControlUpgradeable.sol";
 import "./interfaces/IKeyringCore.sol";
 import "./interfaces/ISignatureChecker.sol";
 
-contract KeyringCore is IKeyringCore, Initializable, OwnableUpgradeable, UUPSUpgradeable {
+contract KeyringCore is IKeyringCore, Initializable, UUPSUpgradeable, AccessControlUpgradeable {
+    bytes32 public constant KEY_MANAGER_ROLE = keccak256("KEY_MANAGER_ROLE");
+    bytes32 public constant UPGRADER_ROLE = keccak256("UPGRADER_ROLE");
+    bytes32 public constant BLACKLIST_MANAGER_ROLE = keccak256("BLACKLIST_MANAGER_ROLE");
+    bytes32 public constant OPERATOR_ROLE = keccak256("OPERAtOR_ROLE");
+
     /// @dev Current implementation version
     /// @custom:oz-upgrades-unsafe-allow state-variable-immutable
     uint64 private immutable CURRENT_VERSION;
-
-    /// @dev Address of the admin.
-    address internal _admin;
 
     /// @dev Mapping from key hash to key entry.
     mapping(bytes32 => KeyEntry) internal _keys;
@@ -33,14 +36,29 @@ contract KeyringCore is IKeyringCore, Initializable, OwnableUpgradeable, UUPSUpg
     /**
      * @notice Initializes the contract.
      * @param _signatureChecker The address of the signature checker.
+     * @param _admin The address that receives the default admin role.
+     * @param _keyManager The address that can revoke and register keys.
+     * @param _upgrader The address that is allowed to upgrade the contract.
+     * @param _blacklistManager The address that can manage blacklist.
+     * @param _operator The operator that is allowed to claim any collected fees.
      */
-    function initialize(address _signatureChecker) public initializer {
-        __Ownable_init(msg.sender);
+    function initialize(
+        address _signatureChecker,
+        address _admin,
+        address _keyManager,
+        address _upgrader,
+        address _blacklistManager,
+        address _operator
+    ) public initializer {
         __UUPSUpgradeable_init();
-        if (_admin == address(0)) {
-            _admin = msg.sender;
-            emit AdminSet(address(0), msg.sender);
-        }
+        __AccessControl_init();
+
+        _grantRole(DEFAULT_ADMIN_ROLE, _admin);
+        _grantRole(KEY_MANAGER_ROLE, _keyManager);
+        _grantRole(UPGRADER_ROLE, _upgrader);
+        _grantRole(BLACKLIST_MANAGER_ROLE, _blacklistManager);
+        _grantRole(OPERATOR_ROLE, _operator);
+
         setSignatureChecker(_signatureChecker);
     }
 
@@ -49,7 +67,11 @@ contract KeyringCore is IKeyringCore, Initializable, OwnableUpgradeable, UUPSUpg
      * @param _signatureChecker The address of the signature checker.
      * @dev This function is only callable by the owner.
      */
-    function reinitialize(address _signatureChecker) public onlyOwner reinitializer(CURRENT_VERSION) {
+    function reinitialize(address _signatureChecker)
+        public
+        onlyRole(DEFAULT_ADMIN_ROLE)
+        reinitializer(CURRENT_VERSION)
+    {
         setSignatureChecker(_signatureChecker);
     }
 
@@ -65,14 +87,14 @@ contract KeyringCore is IKeyringCore, Initializable, OwnableUpgradeable, UUPSUpg
      * @notice Authorizes the upgrade of the contract.
      * @dev This function is only callable by the owner.
      */
-    function _authorizeUpgrade(address newImplementation) internal override onlyOwner {}
+    function _authorizeUpgrade(address newImplementation) internal override onlyRole(UPGRADER_ROLE) {}
 
     /**
      * @notice Sets the signature checker.
      * @param _signatureChecker The address of the signature checker.
      * @dev This function is only callable by the owner.
      */
-    function setSignatureChecker(address _signatureChecker) public onlyOwner {
+    function setSignatureChecker(address _signatureChecker) public onlyRole(DEFAULT_ADMIN_ROLE) {
         if (_signatureChecker == address(0)) {
             revert ErrInvalidSignatureChecker();
         }
@@ -151,14 +173,6 @@ contract KeyringCore is IKeyringCore, Initializable, OwnableUpgradeable, UUPSUpg
         _entityData[policyId][tradingAddress] = ed;
         // Emit the credential created event.
         emit CredentialCreated(policyId, tradingAddress, validUntil, backdoor);
-    }
-
-    /**
-     * @notice Returns the address of the admin.
-     * @return The address of the admin.
-     */
-    function admin() external view returns (address) {
-        return _admin;
     }
 
     /**
@@ -266,21 +280,6 @@ contract KeyringCore is IKeyringCore, Initializable, OwnableUpgradeable, UUPSUpg
         return checkCredential(policyId, entity_);
     }
 
-    // ADMIN CAPABILITIES
-
-    /**
-     * @notice Sets a new admin.
-     * @param newAdmin The address of the new admin.
-     * @dev Only callable by the current admin.
-     */
-    function setAdmin(address newAdmin) external {
-        if (msg.sender != _admin) {
-            revert ErrCallerNotAdmin(msg.sender);
-        }
-        _admin = newAdmin;
-        emit AdminSet(msg.sender, newAdmin);
-    }
-
     /**
      * @notice Registers a new RSA key.
      * @param validFrom The start time of the key's validity.
@@ -288,10 +287,7 @@ contract KeyringCore is IKeyringCore, Initializable, OwnableUpgradeable, UUPSUpg
      * @param key The RSA key.
      * @dev Only callable by the admin.
      */
-    function registerKey(uint256 validFrom, uint256 validTo, bytes memory key) external {
-        if (msg.sender != _admin) {
-            revert ErrCallerNotAdmin(msg.sender);
-        }
+    function registerKey(uint256 validFrom, uint256 validTo, bytes memory key) external onlyRole(KEY_MANAGER_ROLE) {
         if (validTo <= validFrom) {
             revert ErrInvalidKeyRegistration("IVP");
         }
@@ -311,10 +307,7 @@ contract KeyringCore is IKeyringCore, Initializable, OwnableUpgradeable, UUPSUpg
      * @param keyHash The hash of the key to revoke.
      * @dev Only callable by the admin.
      */
-    function revokeKey(bytes32 keyHash) external {
-        if (msg.sender != _admin) {
-            revert ErrCallerNotAdmin(msg.sender);
-        }
+    function revokeKey(bytes32 keyHash) external onlyRole(KEY_MANAGER_ROLE) {
         if (!_keys[keyHash].isValid) {
             revert ErrKeyNotFound(keyHash);
         }
@@ -329,10 +322,7 @@ contract KeyringCore is IKeyringCore, Initializable, OwnableUpgradeable, UUPSUpg
      * @param entity_ The address of the entity to blacklist.
      * @dev Only callable by the admin.
      */
-    function blacklistEntity(uint256 policyId, address entity_) external {
-        if (msg.sender != _admin) {
-            revert ErrCallerNotAdmin(msg.sender);
-        }
+    function blacklistEntity(uint256 policyId, address entity_) external onlyRole(BLACKLIST_MANAGER_ROLE) {
         if (_entityData[policyId][entity_].blacklisted == true) {
             return;
         }
@@ -347,10 +337,7 @@ contract KeyringCore is IKeyringCore, Initializable, OwnableUpgradeable, UUPSUpg
      * @param entity_ The address of the entity to unblacklist.
      * @dev Only callable by the admin.
      */
-    function unblacklistEntity(uint256 policyId, address entity_) external {
-        if (msg.sender != _admin) {
-            revert ErrCallerNotAdmin(msg.sender);
-        }
+    function unblacklistEntity(uint256 policyId, address entity_) external onlyRole(BLACKLIST_MANAGER_ROLE) {
         if (_entityData[policyId][entity_].blacklisted == false) {
             return;
         }
@@ -367,10 +354,7 @@ contract KeyringCore is IKeyringCore, Initializable, OwnableUpgradeable, UUPSUpg
      * @custom:emits This function does not emit any events.
      * @custom:throws ErrCallerNotAdmin if the caller is not the admin.
      */
-    function collectFees(address to) external {
-        if (msg.sender != _admin) {
-            revert ErrCallerNotAdmin(msg.sender);
-        }
+    function collectFees(address to) external onlyRole(OPERATOR_ROLE) {
         sendValue(payable(to), address(this).balance);
     }
 
