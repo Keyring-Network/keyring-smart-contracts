@@ -12,7 +12,7 @@ contract KeyringCore is IKeyringCore, Initializable, UUPSUpgradeable, AccessCont
     bytes32 public constant KEY_MANAGER_ROLE = keccak256("KEY_MANAGER_ROLE");
     bytes32 public constant UPGRADER_ROLE = keccak256("UPGRADER_ROLE");
     bytes32 public constant BLACKLIST_MANAGER_ROLE = keccak256("BLACKLIST_MANAGER_ROLE");
-    bytes32 public constant OPERATOR_ROLE = keccak256("OPERAtOR_ROLE");
+    bytes32 public constant OPERATOR_ROLE = keccak256("OPERATOR_ROLE");
 
     /// @dev Current implementation version
     /// @custom:oz-upgrades-unsafe-allow state-variable-immutable
