@@ -18,4 +18,10 @@ interface IDeployOptions {
         uint256 validFrom;
         uint256 validUntil;
     }
+
+    struct ChangeAdmin {
+        uint256 deployerPrivateKey;
+        address proxyAddress;
+        address newAdmin;
+    }
 }
