@@ -8,23 +8,24 @@ import {IDeployOptions} from "../src/interfaces/IDeployOptions.sol";
 
 import {KeyringCore} from "../src/KeyringCore.sol";
 
-contract ChangeAdmin is Script, IDeployOptions {
+contract GrantRole is Script, IDeployOptions {
     using Strings for string;
 
     function run() external {
-        ChangeAdmin memory changeAdminOptions;
-        changeAdminOptions = ChangeAdmin({
+        GrantRoleOptions memory grantRoleOptions;
+        grantRoleOptions = GrantRoleOptions({
             deployerPrivateKey: vm.envUint("PRIVATE_KEY"),
             proxyAddress: vm.envAddress("PROXY_ADDRESS"),
-            newAdmin: vm.envAddress("NEW_ADMIN")
+            user: vm.envAddress("USER"),
+            role: vm.envBytes32("ROLE")
         });
 
-        changeAdmin(changeAdminOptions);
+        grantRole(grantRoleOptions);
     }
 
-    function changeAdmin(ChangeAdmin memory _changeAdminOptions) public {
-        vm.startBroadcast(_changeAdminOptions.deployerPrivateKey);
-        KeyringCore(_changeAdminOptions.proxyAddress).transferOwnership(_changeAdminOptions.newAdmin);
+    function grantRole(GrantRoleOptions memory _grantRoleOptions) public {
+        vm.startBroadcast(_grantRoleOptions.deployerPrivateKey);
+        KeyringCore(_grantRoleOptions.proxyAddress).grantRole(_grantRoleOptions.role, _grantRoleOptions.user);
         vm.stopBroadcast();
     }
 }

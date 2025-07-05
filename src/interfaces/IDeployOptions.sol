@@ -6,6 +6,11 @@ interface IDeployOptions {
         uint256 deployerPrivateKey;
         string signatureCheckerName;
         string proxyAddress;
+        address admin;
+        address keyManager;
+        address upgrader;
+        address blacklistManager;
+        address operator;
         string etherscanApiKey;
         string verifierUrl;
     }
@@ -19,9 +24,10 @@ interface IDeployOptions {
         uint256 validUntil;
     }
 
-    struct ChangeAdmin {
+    struct GrantRoleOptions {
         uint256 deployerPrivateKey;
         address proxyAddress;
-        address newAdmin;
+        address user;
+        bytes32 role;
     }
 }

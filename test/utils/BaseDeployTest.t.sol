@@ -20,6 +20,22 @@ contract BaseDeployTest is IDeployOptions, Test {
         }
     }
 
+    function setEnv(string memory key, address value) internal {
+        if (keccak256(bytes(key)) == keccak256(bytes("ADMIN"))) {
+            deployOptions.admin = value;
+        } else if (keccak256(bytes(key)) == keccak256(bytes("KEY_MANAGER"))) {
+            deployOptions.keyManager = value;
+        } else if (keccak256(bytes(key)) == keccak256(bytes("UPGRADER"))) {
+            deployOptions.upgrader = value;
+        } else if (keccak256(bytes(key)) == keccak256(bytes("BLACKLIST_MANAGER"))) {
+            deployOptions.blacklistManager = value;
+        } else if (keccak256(bytes(key)) == keccak256(bytes("OPERATOR"))) {
+            deployOptions.operator = value;
+        } else {
+            revert("Unknown environment variable");
+        }
+    }
+
     function setEnv(string memory key, string memory value) internal {
         if (keccak256(bytes(key)) == keccak256(bytes("SIGNATURE_CHECKER_NAME"))) {
             deployOptions.signatureCheckerName = value;

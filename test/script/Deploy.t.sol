@@ -14,6 +14,12 @@ import {BaseDeployTest} from "../utils/BaseDeployTest.t.sol";
 contract DeployTest is BaseDeployTest {
     function test_RevertOnMissingSignatureCheckerName() public {
         setEnv("PRIVATE_KEY", deployerPrivateKey);
+        setEnv("ADMIN", deployerAddress);
+        setEnv("KEY_MANAGER", deployerAddress);
+        setEnv("UPGRADER", deployerAddress);
+        setEnv("BLACKLIST_MANAGER", deployerAddress);
+        setEnv("OPERATOR", deployerAddress);
+
         vm.expectRevert("Invalid signature checker name: ");
         run();
     }
@@ -21,14 +27,84 @@ contract DeployTest is BaseDeployTest {
     function test_RevertOnInvalidSignatureCheckerName() public {
         setEnv("PRIVATE_KEY", deployerPrivateKey);
         setEnv("SIGNATURE_CHECKER_NAME", "InvalidChecker");
+        setEnv("ADMIN", deployerAddress);
+        setEnv("KEY_MANAGER", deployerAddress);
+        setEnv("UPGRADER", deployerAddress);
+        setEnv("BLACKLIST_MANAGER", deployerAddress);
+        setEnv("OPERATOR", deployerAddress);
 
         vm.expectRevert("Invalid signature checker name: InvalidChecker");
+        run();
+    }
+
+    function test_RevertOnMissingDefaultAdmin() public {
+        setEnv("PRIVATE_KEY", deployerPrivateKey);
+        setEnv("SIGNATURE_CHECKER_NAME", "AlwaysValidSignatureChecker");
+        setEnv("KEY_MANAGER", deployerAddress);
+        setEnv("UPGRADER", deployerAddress);
+        setEnv("BLACKLIST_MANAGER", deployerAddress);
+        setEnv("OPERATOR", deployerAddress);
+
+        vm.expectRevert();
+        run();
+    }
+
+    function test_RevertOnMissingKeyManager() public {
+        setEnv("PRIVATE_KEY", deployerPrivateKey);
+        setEnv("SIGNATURE_CHECKER_NAME", "AlwaysValidSignatureChecker");
+        setEnv("ADMIN", deployerAddress);
+        setEnv("UPGRADER", deployerAddress);
+        setEnv("BLACKLIST_MANAGER", deployerAddress);
+        setEnv("OPERATOR", deployerAddress);
+
+        vm.expectRevert();
+        run();
+    }
+
+    function test_RevertOnMissingUpgrader() public {
+        setEnv("PRIVATE_KEY", deployerPrivateKey);
+        setEnv("SIGNATURE_CHECKER_NAME", "AlwaysValidSignatureChecker");
+        setEnv("ADMIN", deployerAddress);
+        setEnv("KEY_MANAGER", deployerAddress);
+        setEnv("BLACKLIST_MANAGER", deployerAddress);
+        setEnv("OPERATOR", deployerAddress);
+
+        vm.expectRevert();
+        run();
+    }
+
+    function test_RevertOnMissingBlacklistManager() public {
+        setEnv("PRIVATE_KEY", deployerPrivateKey);
+        setEnv("SIGNATURE_CHECKER_NAME", "AlwaysValidSignatureChecker");
+        setEnv("ADMIN", deployerAddress);
+        setEnv("KEY_MANAGER", deployerAddress);
+        setEnv("UPGRADER", deployerAddress);
+        setEnv("OPERATOR", deployerAddress);
+
+        vm.expectRevert();
+        run();
+    }
+
+    function test_RevertOnMissingOperator() public {
+        setEnv("PRIVATE_KEY", deployerPrivateKey);
+        setEnv("SIGNATURE_CHECKER_NAME", "AlwaysValidSignatureChecker");
+        setEnv("ADMIN", deployerAddress);
+        setEnv("KEY_MANAGER", deployerAddress);
+        setEnv("UPGRADER", deployerAddress);
+        setEnv("BLACKLIST_MANAGER", deployerAddress);
+
+        vm.expectRevert();
         run();
     }
 
     function test_DeployNewProxy() public {
         setEnv("PRIVATE_KEY", deployerPrivateKey);
         setEnv("SIGNATURE_CHECKER_NAME", "AlwaysValidSignatureChecker");
+        setEnv("ADMIN", deployerAddress);
+        setEnv("KEY_MANAGER", deployerAddress);
+        setEnv("UPGRADER", deployerAddress);
+        setEnv("BLACKLIST_MANAGER", deployerAddress);
+        setEnv("OPERATOR", deployerAddress);
         IKeyringCore proxyAddress = run();
 
         assertTrue(address(proxyAddress) != address(0), "Proxy address should not be null");
@@ -37,6 +113,11 @@ contract DeployTest is BaseDeployTest {
 
     function test_DeployWithDifferentSignatureCheckers() public {
         setEnv("PRIVATE_KEY", deployerPrivateKey);
+        setEnv("ADMIN", deployerAddress);
+        setEnv("KEY_MANAGER", deployerAddress);
+        setEnv("UPGRADER", deployerAddress);
+        setEnv("BLACKLIST_MANAGER", deployerAddress);
+        setEnv("OPERATOR", deployerAddress);
 
         // Test with AlwaysValidSignatureChecker
         setEnv("SIGNATURE_CHECKER_NAME", "AlwaysValidSignatureChecker");
@@ -60,19 +141,21 @@ contract DeployTest is BaseDeployTest {
     function test_UpgradeExistingProxy() public {
         vm.startPrank(deployerAddress);
         address proxyAddress = Upgrades.deployUUPSProxy(
-            "KeyringCoreReferenceContract.sol", abi.encodeCall(KeyringCoreReferenceContract.initialize, ())
+            "KeyringCoreReferenceContract.sol",
+            abi.encodeCall(KeyringCoreReferenceContract.initialize, (deployerAddress, deployerAddress))
         );
         vm.stopPrank();
         assertTrue(address(proxyAddress) != address(0), "Proxy address should not be null");
-        bytes memory data = abi.encodeWithSignature("owner()");
+        bytes memory data = abi.encodeWithSignature("hasRole(bytes32,address)", bytes32(0x0), deployerAddress);
         (bool success, bytes memory result) = proxyAddress.staticcall(data);
         require(success, "Call failed");
-        address keyringOwnerAddress = abi.decode(result, (address));
-        assertTrue(keyringOwnerAddress == deployerAddress, "Owner address should be the deployer");
+        bool isAdmin = abi.decode(result, (bool));
+        assertTrue(isAdmin, "Not Owner");
 
         setEnv("PRIVATE_KEY", deployerPrivateKey);
         setEnv("SIGNATURE_CHECKER_NAME", "AlwaysValidSignatureChecker");
         setEnv("PROXY_ADDRESS", vm.toString(proxyAddress));
+
         address upgradedProxyAddress = address(run());
         assertEq(upgradedProxyAddress, proxyAddress, "Proxy address should remain the same");
     }
@@ -80,6 +163,11 @@ contract DeployTest is BaseDeployTest {
     function test_RevertOnUpgradeWithTheSameVersion() public {
         setEnv("PRIVATE_KEY", deployerPrivateKey);
         setEnv("SIGNATURE_CHECKER_NAME", "AlwaysValidSignatureChecker");
+        setEnv("ADMIN", deployerAddress);
+        setEnv("KEY_MANAGER", deployerAddress);
+        setEnv("UPGRADER", deployerAddress);
+        setEnv("BLACKLIST_MANAGER", deployerAddress);
+        setEnv("OPERATOR", deployerAddress);
         address proxyAddress = address(run());
         assertTrue(address(proxyAddress) != address(0));
 
@@ -91,14 +179,18 @@ contract DeployTest is BaseDeployTest {
     function test_RevertOnUpgradeWithInvalidOwner() public {
         setEnv("PRIVATE_KEY", deployerPrivateKey);
         setEnv("SIGNATURE_CHECKER_NAME", "AlwaysValidSignatureChecker");
+        setEnv("ADMIN", deployerAddress);
+        setEnv("KEY_MANAGER", deployerAddress);
+        setEnv("UPGRADER", deployerAddress);
+        setEnv("BLACKLIST_MANAGER", deployerAddress);
+        setEnv("OPERATOR", deployerAddress);
         address proxyAddress = address(run());
         assertTrue(address(proxyAddress) != address(0));
-        // Get owner using low-level call cause of non external owner() function
-        bytes memory data = abi.encodeWithSignature("owner()");
+        bytes memory data = abi.encodeWithSignature("hasRole(bytes32,address)", bytes32(0x0), deployerAddress);
         (bool success, bytes memory result) = proxyAddress.staticcall(data);
         require(success, "Call failed");
-        address keyringOwnerAddress = abi.decode(result, (address));
-        assertTrue(keyringOwnerAddress == deployerAddress);
+        bool isAdmin = abi.decode(result, (bool));
+        assertTrue(isAdmin, "Not Owner");
 
         uint256 maliciousPrivateKey = 0xB22DF;
         address maliciousAddress = vm.addr(maliciousPrivateKey);
@@ -107,7 +199,11 @@ contract DeployTest is BaseDeployTest {
         setEnv("PROXY_ADDRESS", vm.toString(proxyAddress));
         setEnv("PRIVATE_KEY", maliciousPrivateKey);
         vm.expectRevert(
-            abi.encodeWithSelector(bytes4(keccak256("OwnableUnauthorizedAccount(address)")), maliciousAddress)
+            abi.encodeWithSelector(
+                bytes4(keccak256("AccessControlUnauthorizedAccount(address,bytes32)")),
+                maliciousAddress,
+                keccak256("UPGRADER_ROLE")
+            )
         );
         run();
     }

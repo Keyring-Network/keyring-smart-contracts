@@ -23,8 +23,14 @@ contract KeyringCoreE2EEIP191Test is BaseDeployTest {
         vm.chainId(1625247600);
         setEnv("SIGNATURE_CHECKER_NAME", "EIP191SignatureChecker");
         setEnv("PRIVATE_KEY", deployerPrivateKey);
+        setEnv("ADMIN", deployerAddress);
+        setEnv("KEY_MANAGER", deployerAddress);
+        setEnv("UPGRADER", deployerAddress);
+        setEnv("BLACKLIST_MANAGER", deployerAddress);
+        setEnv("OPERATOR", deployerAddress);
+
         keyringCore = run();
-        vm.startPrank(keyringCore.admin());
+        vm.startPrank(deployerAddress);
         keyringCore.registerKey(block.timestamp, block.timestamp + 1000, key);
         vm.stopPrank();
         assertEq(keyringCore.getKeyHash(key), 0x8dd832049319556c1cd22ed66ae790d07fea25830a6151c2f0a9879b3ef61305);
@@ -51,7 +57,7 @@ contract KeyringCoreE2EEIP191Test is BaseDeployTest {
 
     function test_createCredentialWithUnregisteredKey() public {
         assertEq(keyringCore.checkCredential(tradingAddress, policyId), false);
-        vm.startPrank(keyringCore.admin());
+        vm.startPrank(deployerAddress);
         keyringCore.revokeKey(keyringCore.getKeyHash(key));
         vm.stopPrank();
         vm.expectRevert(

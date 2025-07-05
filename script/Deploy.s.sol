@@ -21,6 +21,11 @@ contract Deploy is Script, IDeployOptions {
             deployerPrivateKey: vm.envUint("PRIVATE_KEY"),
             signatureCheckerName: vm.envOr("SIGNATURE_CHECKER_NAME", emptyString),
             proxyAddress: vm.envOr("PROXY_ADDRESS", emptyString),
+            admin: vm.envAddress("ADMIN"),
+            keyManager: vm.envAddress("KEY_MANAGER"),
+            upgrader: vm.envAddress("UPGRADER"),
+            blacklistManager: vm.envAddress("BLACKLIST_MANAGER"),
+            operator: vm.envAddress("OPERATOR"),
             etherscanApiKey: vm.envOr("ETHERSCAN_API_KEY", emptyString),
             verifierUrl: vm.envOr("ETHERSCAN_BASE_API_URL", emptyString)
         });
@@ -52,7 +57,18 @@ contract Deploy is Script, IDeployOptions {
             console.log("Deploying the KeyringCore contract proxy and implementation");
             vm.startBroadcast(deployOptions.deployerPrivateKey);
             proxyAddress = Upgrades.deployUUPSProxy(
-                "KeyringCore.sol", abi.encodeCall(KeyringCore.initialize, signatureCheckerAddress)
+                "KeyringCore.sol",
+                abi.encodeCall(
+                    KeyringCore.initialize,
+                    (
+                        signatureCheckerAddress,
+                        deployOptions.admin,
+                        deployOptions.keyManager,
+                        deployOptions.upgrader,
+                        deployOptions.blacklistManager,
+                        deployOptions.operator
+                    )
+                )
             );
             KeyringCore keyringCore = KeyringCore(proxyAddress);
             if (keyringCore.mustBeReInitialized()) {
