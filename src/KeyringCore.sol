@@ -54,6 +54,13 @@ contract KeyringCore is IKeyringCore, Initializable, UUPSUpgradeable, AccessCont
         address _blacklistManager,
         address _operator
     ) public initializer {
+        if (
+            _admin == address(0) || _keyManager == address(0) || _upgrader == address(0)
+                || _blacklistManager == address(0) || _operator == address(0)
+        ) {
+            revert ErrAddressZero();
+        }
+
         __UUPSUpgradeable_init();
         __AccessControl_init();
 

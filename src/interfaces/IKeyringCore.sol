@@ -32,6 +32,9 @@ interface IKeyringCore {
         uint64 validTo;
     }
 
+    /// @notice This error is thrown when the input address is a zero address.
+    error ErrAddressZero();
+
     /// @notice This error is returned if the signature checker is invalid.
     error ErrInvalidSignatureChecker();
 

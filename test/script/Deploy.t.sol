@@ -19,6 +19,7 @@ contract DeployTest is BaseDeployTest {
         setEnv("UPGRADER", deployerAddress);
         setEnv("BLACKLIST_MANAGER", deployerAddress);
         setEnv("OPERATOR", deployerAddress);
+
         vm.expectRevert("Invalid signature checker name: ");
         run();
     }
@@ -33,6 +34,66 @@ contract DeployTest is BaseDeployTest {
         setEnv("OPERATOR", deployerAddress);
 
         vm.expectRevert("Invalid signature checker name: InvalidChecker");
+        run();
+    }
+
+    function test_RevertOnMissingDefaultAdmin() public {
+        setEnv("PRIVATE_KEY", deployerPrivateKey);
+        setEnv("SIGNATURE_CHECKER_NAME", "AlwaysValidSignatureChecker");
+        setEnv("KEY_MANAGER", deployerAddress);
+        setEnv("UPGRADER", deployerAddress);
+        setEnv("BLACKLIST_MANAGER", deployerAddress);
+        setEnv("OPERATOR", deployerAddress);
+
+        vm.expectRevert();
+        run();
+    }
+
+    function test_RevertOnMissingKeyManager() public {
+        setEnv("PRIVATE_KEY", deployerPrivateKey);
+        setEnv("SIGNATURE_CHECKER_NAME", "AlwaysValidSignatureChecker");
+        setEnv("ADMIN", deployerAddress);
+        setEnv("UPGRADER", deployerAddress);
+        setEnv("BLACKLIST_MANAGER", deployerAddress);
+        setEnv("OPERATOR", deployerAddress);
+
+        vm.expectRevert();
+        run();
+    }
+
+    function test_RevertOnMissingUpgrader() public {
+        setEnv("PRIVATE_KEY", deployerPrivateKey);
+        setEnv("SIGNATURE_CHECKER_NAME", "AlwaysValidSignatureChecker");
+        setEnv("ADMIN", deployerAddress);
+        setEnv("KEY_MANAGER", deployerAddress);
+        setEnv("BLACKLIST_MANAGER", deployerAddress);
+        setEnv("OPERATOR", deployerAddress);
+
+        vm.expectRevert();
+        run();
+    }
+
+    function test_RevertOnMissingBlacklistManager() public {
+        setEnv("PRIVATE_KEY", deployerPrivateKey);
+        setEnv("SIGNATURE_CHECKER_NAME", "AlwaysValidSignatureChecker");
+        setEnv("ADMIN", deployerAddress);
+        setEnv("KEY_MANAGER", deployerAddress);
+        setEnv("UPGRADER", deployerAddress);
+        setEnv("OPERATOR", deployerAddress);
+
+        vm.expectRevert();
+        run();
+    }
+
+    function test_RevertOnMissingOperator() public {
+        setEnv("PRIVATE_KEY", deployerPrivateKey);
+        setEnv("SIGNATURE_CHECKER_NAME", "AlwaysValidSignatureChecker");
+        setEnv("ADMIN", deployerAddress);
+        setEnv("KEY_MANAGER", deployerAddress);
+        setEnv("UPGRADER", deployerAddress);
+        setEnv("BLACKLIST_MANAGER", deployerAddress);
+
+        vm.expectRevert();
         run();
     }
 
