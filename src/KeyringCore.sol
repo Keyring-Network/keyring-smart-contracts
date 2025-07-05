@@ -70,7 +70,10 @@ contract KeyringCore is IKeyringCore, Initializable, UUPSUpgradeable, AccessCont
         _grantRole(BLACKLIST_MANAGER_ROLE, _blacklistManager);
         _grantRole(OPERATOR_ROLE, _operator);
 
-        setSignatureChecker(_signatureChecker);
+        if (_signatureChecker == address(0)) {
+            revert ErrInvalidSignatureChecker();
+        }
+        signatureChecker = ISignatureChecker(_signatureChecker);
     }
 
     /**
