@@ -23,4 +23,11 @@ interface IDeployOptions {
         uint256 validFrom;
         uint256 validUntil;
     }
+
+    struct GrantRoleOptions {
+        uint256 deployerPrivateKey;
+        address proxyAddress;
+        address user;
+        bytes32 role;
+    }
 }
