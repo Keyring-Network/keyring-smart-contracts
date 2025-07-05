@@ -9,9 +9,13 @@ import "./interfaces/IKeyringCore.sol";
 import "./interfaces/ISignatureChecker.sol";
 
 contract KeyringCore is IKeyringCore, Initializable, UUPSUpgradeable, AccessControlUpgradeable {
+    /// @notice User's with this role can register and revoke keys.
     bytes32 public constant KEY_MANAGER_ROLE = keccak256("KEY_MANAGER_ROLE");
+    /// @notice User's with this role can upgrade the contract.
     bytes32 public constant UPGRADER_ROLE = keccak256("UPGRADER_ROLE");
+    /// @notice User's with this role can blacklist/unblacklist other users.
     bytes32 public constant BLACKLIST_MANAGER_ROLE = keccak256("BLACKLIST_MANAGER_ROLE");
+    /// @notice User's with this role can withdraw any collected fees..
     bytes32 public constant OPERATOR_ROLE = keccak256("OPERATOR_ROLE");
 
     /// @dev Current implementation version
