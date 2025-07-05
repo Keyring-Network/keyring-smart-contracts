@@ -25,6 +25,7 @@ OUT_FOLDER="$ROOT/out"
 
 # Default values
 PRIVATE_KEY="0x024cf65eb3bc550a1a6675aa21d146d7476fc5b62715d24fb2e0027647a213af"
+PUBLIC_KEY="0x7C010FD1B3e279ac063d862199484254f27C2C44"
 RPC_URL=http://localhost:8545
 
 # Help function
@@ -84,6 +85,11 @@ forge build
 
 for SIGNATURE_CHECKER_NAME in $SIGNATURE_CHECKERS_NAMES; do
     export SIGNATURE_CHECKER_NAME=$SIGNATURE_CHECKER_NAME
+    export ADMIN=$PUBLIC_KEY
+    export KEY_MANAGER=$PUBLIC_KEY
+    export UPGRADER=$PUBLIC_KEY
+    export BLACKLIST_MANAGER=$PUBLIC_KEY
+    export OPERATOR=$PUBLIC_KEY
     echo "Deploying the contract with the signature checker $SIGNATURE_CHECKER_NAME..."
     forge script script/Deploy.s.sol \
             --broadcast \
