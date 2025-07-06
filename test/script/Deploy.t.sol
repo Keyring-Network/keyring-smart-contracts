@@ -138,7 +138,7 @@ contract DeployTest is BaseDeployTest {
         assertTrue(address(keyringCore3.signatureChecker()) != address(0));
     }
 
-    function test_UpgradeExistingProxy() public {
+    function test_UpgradingExistingProxyWithSameVersionFails() public {
         vm.startPrank(deployerAddress);
         address proxyAddress = Upgrades.deployUUPSProxy(
             "KeyringCoreReferenceContract.sol",
@@ -156,8 +156,8 @@ contract DeployTest is BaseDeployTest {
         setEnv("SIGNATURE_CHECKER_NAME", "AlwaysValidSignatureChecker");
         setEnv("PROXY_ADDRESS", vm.toString(proxyAddress));
 
-        address upgradedProxyAddress = address(run());
-        assertEq(upgradedProxyAddress, proxyAddress, "Proxy address should remain the same");
+        vm.expectRevert();
+        address(run());
     }
 
     function test_RevertOnUpgradeWithTheSameVersion() public {
