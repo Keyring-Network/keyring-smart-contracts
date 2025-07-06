@@ -23,7 +23,7 @@ contract ManageRoles is Script, IDeployOptions {
 
         // mangeRoles(manageRolesOptions);
         uint256 deployerPrivateKey = vm.envUint("PRIVATE_KEY");
-        address proxy = vm.envAddress("PROXY");
+        address proxy = vm.envAddress("PROXY_ADDRESS");
 
         vm.startBroadcast(deployerPrivateKey);
         KeyringCore(proxy).grantRole(bytes32(0), 0x3eb3CD91c631dDf579723141d397d400000997cc);
