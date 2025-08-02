@@ -74,7 +74,7 @@ echo "RPC URL: $RPC_URL"
 export PRIVATE_KEY=$PRIVATE_KEY
 
 # ensure that the deploy script will actually deploy a new proxy
-export PROXY_ADDRESS="0x0000000000000000000000000000000000000000"
+export KEYRING_PROXY="0x0000000000000000000000000000000000000000"
 
 # get all the contracts in the directory src/signatureCheckers
 SIGNATURE_CHECKERS_NAMES=$(find "$ROOT/src/signatureCheckers" -name "*.sol" -exec basename {} .sol \;)
