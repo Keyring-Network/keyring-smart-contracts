@@ -15,7 +15,7 @@ contract RotateKey is Script, IDeployOptions {
         RotateKeyOptions memory rotateKeyOptions;
         rotateKeyOptions = RotateKeyOptions({
             deployerPrivateKey: vm.envUint("PRIVATE_KEY"),
-            proxyAddress: vm.envAddress("PROXY_ADDRESS"),
+            proxyAddress: vm.envAddress("KEYRING_PROXY"),
             previousKey: vm.envString("PREVIOUS_KEY"),
             key: vm.envString("KEY"),
             validFrom: vm.envUint("VALID_FROM"),

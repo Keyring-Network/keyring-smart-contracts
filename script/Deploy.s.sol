@@ -20,7 +20,7 @@ contract Deploy is Script, IDeployOptions {
         deployOptions = DeployOptions({
             deployerPrivateKey: vm.envUint("PRIVATE_KEY"),
             signatureCheckerName: vm.envOr("SIGNATURE_CHECKER_NAME", emptyString),
-            proxyAddress: vm.envOr("PROXY_ADDRESS", emptyString),
+            proxyAddress: vm.envOr("KEYRING_PROXY", emptyString),
             admin: vm.envAddress("ADMIN"),
             keyManager: vm.envAddress("KEY_MANAGER"),
             upgrader: vm.envAddress("UPGRADER"),
