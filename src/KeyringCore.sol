@@ -33,7 +33,7 @@ contract KeyringCore is IKeyringCore, Initializable, UUPSUpgradeable, AccessCont
 
     /// @custom:oz-upgrades-unsafe-allow constructor
     constructor() {
-        CURRENT_VERSION = 1;
+        CURRENT_VERSION = 2;
         _disableInitializers();
     }
 
